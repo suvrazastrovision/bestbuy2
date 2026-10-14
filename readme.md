@@ -2,7 +2,7 @@
 
 A small Python store inventory app with product types and purchase promotions.
 
-## OOP and logic
+## OOP and logic behind the app
 
 - **Encapsulation:** products manage their stock and optional promotion.
 - **Inheritance:** non-stocked and limited products extend `Product`.
