@@ -1,3 +1,9 @@
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from promotions import Promotion
+
+
 class Product:
     def __init__(self, name, price, quantity):
         if not name:
@@ -8,6 +14,8 @@ class Product:
         self.name = name
         self.price = price
         self.quantity = quantity
+        self.promotion: Promotion | None = None
+        self.last_purchase_price = 0.0
 
     def display_info(self):
         return f"Product Name: {self.name}, Price: EUR{self.price:.2f}, Quantity: {self.quantity}"
@@ -17,6 +25,12 @@ class Product:
             raise ValueError("Insufficient quantity.")
 
         if 0 < amount <= self.quantity:
+            if self.promotion is None:
+                self.last_purchase_price = self.price * amount
+            else:
+                self.last_purchase_price = self.promotion.apply_promotion(
+                    self, amount
+                )
             self.quantity -= amount
             return f"Successfully bought {amount} {self.name}(s)."
         else:
@@ -27,6 +41,14 @@ class Product:
 
     def show(self):
         print(self.display_info())
+        if self.promotion is not None:
+            print(f"Promotion: {self.promotion.name}")
+
+    def get_promotion(self) -> Promotion | None:
+        return self.promotion
+
+    def set_promotion(self, promotion: Promotion | None) -> None:
+        self.promotion = promotion
 
     def set_quantity(self, new_quantity):
         if new_quantity >= 0:

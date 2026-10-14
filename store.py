@@ -31,6 +31,6 @@ class Store:
                 raise ValueError(f"Invalid quantity for {product.name}.")
 
             product.buy(quantity)
-            total_price += product.price * quantity
+            total_price += product.last_purchase_price
 
         return total_price
