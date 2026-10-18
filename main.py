@@ -12,8 +12,9 @@ def list_products(store_obj):
 
     for number, product in enumerate(available_products, start=1):
         product_info = product.display_info()
-        if product.get_promotion() is not None:
-            product_info += f", Promotion: {product.get_promotion().name}"
+        promotion = product.get_promotion()
+        if promotion is not None:
+            product_info += f", Promotion: {promotion.name}"
         print(f"{number}. {product_info}")
     return available_products
 
@@ -130,10 +131,15 @@ def start(store_obj):
             print("Invalid option. Please choose a number from 1 to 5.")
 
 
-# setup initial stock of inventory
-product_list = [products.Product("MacBook Air M2", price=1450, quantity=100),
-                products.Product("Bose QuietComfort Earbuds", price=250, quantity=500),
-                products.Product("Google Pixel 7", price=500, quantity=250)]
+# Set up initial stock and demonstrate each available promotion.
+product_list = [
+    products.Product("MacBook Air M2", price=1450, quantity=100),
+    products.Product("Bose QuietComfort Earbuds", price=250, quantity=500),
+    products.Product("Google Pixel 7", price=500, quantity=250),
+]
+product_list[0].set_promotion(promotions.PercentDiscount("30% off", 30))
+product_list[1].set_promotion(promotions.SecondHalfPrice("Second item half price"))
+product_list[2].set_promotion(promotions.ThirdOneFree("Buy two, get one free"))
 best_buy = store.Store(product_list)
 
 

@@ -4,6 +4,12 @@ from promotions import PercentDiscount, SecondHalfPrice
 from store import Store
 
 
+def test_initial_products_have_promotions():
+    assert all(
+        product.get_promotion() is not None for product in main.best_buy.products
+    )
+
+
 def test_manage_promotions_assigns_selected_promotion(monkeypatch, capsys):
     product = Product("MacBook Air M2", price=1450, quantity=10)
     store = Store([product])

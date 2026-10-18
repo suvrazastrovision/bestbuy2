@@ -138,6 +138,25 @@ def test_buy_records_discounted_price_for_current_promotion():
     assert product.last_purchase_price == 2900
 
 
-def test_percent_discount_rejects_invalid_percentage():
+@pytest.mark.parametrize(
+    "percent", [-1, 101, float("nan"), float("inf"), "30", 10**1000]
+)
+def test_percent_discount_rejects_invalid_percentage(percent):
     with pytest.raises(ValueError):
-        PercentDiscount("Invalid discount", percent=101)
+        PercentDiscount("Invalid discount", percent=percent)
+
+
+@pytest.mark.parametrize(
+    ("promotion", "quantity", "expected_price"),
+    [
+        (PercentDiscount("30% off", 30), 2, 2030.0),
+        (SecondHalfPrice("Second item half price"), 3, 3625.0),
+        (ThirdOneFree("Buy two, get one free"), 3, 2900.0),
+    ],
+)
+def test_store_order_uses_each_promotion(promotion, quantity, expected_price):
+    product = Product("MacBook Air M2", price=1450, quantity=10)
+    product.set_promotion(promotion)
+
+    assert Store([product]).order([(product, quantity)]) == pytest.approx(expected_price)
+    assert product.quantity == 10 - quantity
