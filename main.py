@@ -1,4 +1,5 @@
 import products
+import promotions
 import store
 
 
@@ -10,8 +11,58 @@ def list_products(store_obj):
         return available_products
 
     for number, product in enumerate(available_products, start=1):
-        print(f"{number}. {product.display_info()}")
+        product_info = product.display_info()
+        if product.get_promotion() is not None:
+            product_info += f", Promotion: {product.get_promotion().name}"
+        print(f"{number}. {product_info}")
     return available_products
+
+
+def manage_promotions(store_obj):
+    """Assign or remove a promotion for an active product."""
+    available_products = list_products(store_obj)
+    if not available_products:
+        return
+
+    product_number = input("Choose a product number: ").strip()
+    try:
+        product_index = int(product_number) - 1
+    except ValueError:
+        print("Invalid product number.")
+        return
+
+    if not 0 <= product_index < len(available_products):
+        print("Invalid product number.")
+        return
+    product = available_products[product_index]
+
+    print("1. Percentage discount")
+    print("2. Second item half price")
+    print("3. Buy two, get one free")
+    print("4. Remove promotion")
+    promotion_choice = input("Choose a promotion: ").strip()
+
+    if promotion_choice == "1":
+        try:
+            percent = float(input("Enter discount percentage (0-100): "))
+            promotion = promotions.PercentDiscount(f"{percent:g}% off", percent)
+        except ValueError as error:
+            print(f"Invalid discount percentage: {error}")
+            return
+    elif promotion_choice == "2":
+        promotion = promotions.SecondHalfPrice("Second item half price")
+    elif promotion_choice == "3":
+        promotion = promotions.ThirdOneFree("Buy two, get one free")
+    elif promotion_choice == "4":
+        product.set_promotion(None)
+        print(f"Promotion removed from {product.name}.")
+        return
+    else:
+        print("Invalid promotion choice.")
+        return
+
+    product.set_promotion(promotion)
+    print(f"{promotion.name} promotion applied to {product.name}.")
 
 
 def make_order(store_obj):
@@ -59,7 +110,8 @@ def start(store_obj):
         print("1. List all products in store")
         print("2. Show total amount in store")
         print("3. Make an order")
-        print("4. Quit")
+        print("4. Manage promotions")
+        print("5. Quit")
 
         choice = input("Please choose an option: ").strip()
 
@@ -70,10 +122,12 @@ def start(store_obj):
         elif choice == "3":
             make_order(store_obj)
         elif choice == "4":
+            manage_promotions(store_obj)
+        elif choice == "5":
             print("Thank you for visiting Best Buy!")
             break
         else:
-            print("Invalid option. Please choose a number from 1 to 4.")
+            print("Invalid option. Please choose a number from 1 to 5.")
 
 
 # setup initial stock of inventory
